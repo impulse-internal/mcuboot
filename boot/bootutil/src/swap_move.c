@@ -494,6 +494,13 @@ fixup_revert(const struct boot_loader_state *state, struct boot_status *bs,
     }
 }
 
+__attribute__((weak)) void
+post_swap_custom(struct boot_loader_state *state, struct boot_status *bs,
+                 uint32_t idx, const struct flash_area *fap_pri,
+                 const struct flash_area *fap_sec) {
+}
+
+
 void
 swap_run(struct boot_loader_state *state, struct boot_status *bs,
          uint32_t copy_size)
@@ -570,6 +577,8 @@ swap_run(struct boot_loader_state *state, struct boot_status *bs,
         }
         idx++;
     }
+
+    post_swap_custom(state, bs, idx, fap_pri, fap_sec);
 
     flash_area_close(fap_pri);
     flash_area_close(fap_sec);
