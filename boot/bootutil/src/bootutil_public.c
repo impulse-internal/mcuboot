@@ -396,7 +396,6 @@ boot_write_swap_info(const struct flash_area *fap, uint8_t swap_type,
 int
 boot_swap_type_multi(int image_index)
 {
-    const struct boot_swap_table *table;
     struct boot_swap_state primary_slot;
     struct boot_swap_state secondary_slot;
     int rc;
@@ -428,7 +427,7 @@ boot_swap_type_multi(int image_index)
     }
 
     for (i = 0; i < BOOT_SWAP_TABLES_COUNT; i++) {
-        table = boot_swap_tables + i;
+        const struct boot_swap_table *table = boot_swap_tables + i;
 
         if (boot_magic_compatible_check(table->magic_primary_slot,
                                         primary_slot.magic) &&
@@ -736,9 +735,8 @@ boot_image_load_header(const struct flash_area *fa_p,
     int rc = flash_area_read(fa_p, 0, hdr, sizeof *hdr);
 
     if (rc != 0) {
-        rc = BOOT_EFLASH;
         BOOT_LOG_ERR("Failed reading image header");
-	return BOOT_EFLASH;
+        return BOOT_EFLASH;
     }
 
     if (hdr->ih_magic != IMAGE_MAGIC) {
