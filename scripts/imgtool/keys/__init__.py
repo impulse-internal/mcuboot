@@ -44,6 +44,25 @@ class PasswordRequired(Exception):
 
 
 def load(path, passwd=None):
+    if path.startswith("pkcs11:"):
+        import pkcs11
+        import pkcs11.exceptions
+        import sys
+
+        from .imgtool_keys_pkcs11 import PKCS11
+
+        try:
+            return PKCS11(path)  # assume a PKCS #11 URI according to RFC7512
+        except pkcs11.exceptions.PinIncorrect:
+            print('ERROR: WRONG PIN')
+            sys.exit(1)
+        except pkcs11.exceptions.PinLocked:
+            print('ERROR: WRONG PIN, MAX ATTEMPTS REACHED. CONTACT YOUR SECURITY OFFICER.')
+            sys.exit(1)
+        except pkcs11.exceptions.DataLenRange:
+            print('ERROR: PIN IS TOO SHORT OR TOO LONG')
+            sys.exit(1)
+
     """Try loading a key from the given path.
       Returns None if the password wasn't specified."""
     with open(path, 'rb') as f:

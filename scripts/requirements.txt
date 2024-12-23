@@ -3,3 +3,7 @@ intelhex
 click
 cbor2
 pyyaml
+# oscrypto
+# fix incompatibility with openssl 3.0.x
+https://github.com/wbond/oscrypto/archive/d5f3437ed24257895ae1edd9e503cfb352e635a8.zip
+python-pkcs11
