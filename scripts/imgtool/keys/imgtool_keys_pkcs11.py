@@ -23,22 +23,16 @@ def find_library(filename):
                 filename,
             )
 
-def unquote_to_bytes(urlencoded_string):
-    """Replace %xx escapes by their single-character equivalent,
-using the “iso-8859-1” encoding to decode all 8-bit values.
-    """
-    return bytes(
-        unquote(urlencoded_string, encoding='iso-8859-1'),
-        encoding='iso-8859-1'
-    )
-
 def get_pkcs11_uri_params(uri):
     uri_tokens = urlparse(uri)
     assert(uri_tokens.scheme == 'pkcs11')
     assert(uri_tokens.query == '')
     assert(uri_tokens.fragment == '')
+    # CKA_LABEL (the "object" attribute per RFC 7512) is a UTF-8 string, so
+    # decode percent-escapes straight to str. python-pkcs11's handle_str will
+    # encode to bytes when packing the attribute.
     return {
-        unquote_to_bytes(key): unquote_to_bytes(value)
+        unquote(key): unquote(value)
         for key, value
         in [
             line.split('=')
@@ -80,7 +74,7 @@ class PKCS11(KeyClass):
         # try to open a session to see if the PIN is valid
         with self.token.open() as session:
             pass
-        self.key_id = params[b'object']
+        self.key_id = params['object']
 
     def shortname(self):
         return "ecdsa"
